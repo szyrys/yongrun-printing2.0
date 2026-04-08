@@ -43,6 +43,12 @@ async function loadLanguage(langCode) {
         updatePlaceholders();
         updateProductGrid();
         
+        // 同步页脚语言下拉框
+        const footerSelect = document.getElementById('footerLanguageSelect');
+        if (footerSelect) {
+            footerSelect.value = langCode;
+        }
+        
         localStorage.setItem('preferredLanguage', langCode);
     } catch (error) {
         console.error('加载语言失败:', error);
@@ -96,18 +102,13 @@ function updateProductGrid() {
     });
 }
 
-// ===== 渲染语言切换按钮 =====
+// ===== 渲染语言切换按钮（已禁用，改用页脚下拉框）=====
 function renderLanguageButtons() {
+    // 不再使用顶部按钮，已移至页脚
     const container = document.getElementById('languageSelector');
-    if (!container) return;
-    
-    container.innerHTML = '';
-    languages.forEach(lang => {
-        const btn = document.createElement('button');
-        btn.textContent = lang.name;
-        btn.onclick = () => loadLanguage(lang.code);
-        container.appendChild(btn);
-    });
+    if (container) {
+        container.innerHTML = '';
+    }
 }
 
 // ===== 移动端菜单 =====
@@ -120,6 +121,41 @@ function initMobileMenu() {
             navMenu.classList.toggle('active');
         });
     }
+}
+
+// ===== 在页脚动态添加语言选择下拉框 =====
+function addFooterLanguageSelector() {
+    const footer = document.querySelector('.footer .container');
+    if (footer && !document.getElementById('footerLanguageSelect')) {
+        const div = document.createElement('div');
+        div.style.marginTop = '20px';
+        div.innerHTML = `
+            <label style="margin-right: 10px;">🌐 Language / 语言 :</label>
+            <select id="footerLanguageSelect" style="padding: 6px 12px; border-radius: 6px; background: white; color: #1a2a4f; border: 1px solid #c9a03d; cursor: pointer; font-size: 14px;">
+                <option value="en">English</option>
+                <option value="zh-CN">简体中文</option>
+                <option value="zh-TW">繁體中文</option>
+                <option value="de">Deutsch</option>
+                <option value="es">Español</option>
+                <option value="pt">Português</option>
+                <option value="ar">العربية</option>
+                <option value="ja">日本語</option>
+                <option value="ko">한국어</option>
+            </select>
+        `;
+        footer.appendChild(div);
+        
+        const select = document.getElementById('footerLanguageSelect');
+        select.addEventListener('change', (e) => {
+            loadLanguage(e.target.value);
+        });
+        select.value = currentLang;
+    }
+}
+
+// ===== 辅助函数 =====
+function t(key) {
+    return translations[key] || key;
 }
 
 // ===== 初始化 =====
@@ -138,9 +174,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
     
     await loadLanguage(initLang);
+    
+    // 添加页脚语言下拉框
+    addFooterLanguageSelector();
 });
-
-// ===== 辅助函数：获取当前翻译 =====
-function t(key) {
-    return translations[key] || key;
-}
