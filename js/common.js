@@ -1,5 +1,3 @@
-// 获取 supabase 客户端
-const supabase = window.supabaseClient;
 // ===== 多语言配置 =====
 const languages = [
     { code: 'en', name: 'English', dir: 'ltr' },
